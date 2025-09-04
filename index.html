@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>คำนวณ TDEE – ระบบเมตริกเท่านั้น</title>
+  <style>
+    :root{--bg:#0b0f14;--card:#121823;--muted:#8aa0b2;--text:#e6eef5;--accent:#37d3a7;--danger:#ff6b6b;--line:rgba(255,255,255,.06);} 
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;}
+    .container{max-width:980px;margin-inline:auto;padding:16px;}
+    h1{font-size:1.6rem;margin:0 0 12px;}
+    p{color:var(--muted);} 
+    .results{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(11,15,20,.98),rgba(11,15,20,.92));backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line);} 
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;} 
+    .grid{display:grid;gap:10px;} 
+    .grid-3{grid-template-columns:1fr;} 
+    @media(min-width:480px){.grid-3{grid-template-columns:1fr 1fr;}} 
+    @media(min-width:768px){.grid-3{grid-template-columns:1fr 1fr 1fr;}} 
+    label{font-size:.9rem;color:#cfe0ec;display:block;margin-bottom:4px;} 
+    .input,select{width:50%;background:#0e141c;border:1px solid rgba(255,255,255,.08);color:var(--text);padding:6px 8px;border-radius:8px;font-size:.9rem;} 
+    .btn{border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn-primary{background:var(--accent);color:#04251b}
+    .btn-danger{background:var(--danger);color:white}
+    .stack{display:flex;gap:8px;flex-wrap:wrap}
+    .kpis{display:grid;gap:10px;grid-template-columns:1fr}
+    @media(min-width:640px){.kpis{grid-template-columns:repeat(3,1fr)}}
+    .kpi{border-radius:14px;padding:12px;background:#0f1620;border:1px solid var(--line)}
+    .kpi h3{margin:0 0 4px;font-size:.95rem;}
+    .kpi .value{font-size:1.4rem;font-weight:800}
+    .tag{display:inline-flex;font-size:.8rem;color:#0a2d22;background:var(--accent);padding:2px 6px;border-radius:999px;font-weight:700}
+    .muted{color:var(--muted)}
+    .error{color:var(--danger);font-size:.9rem}
+    .footer-card{background:#0f1620;border:1px solid var(--line);border-radius:16px;padding:14px}
+    input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+    input[type=number]{ -moz-appearance:textfield; }
+    .row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:12px 0}
+    .hint{font-size:.85rem;color:#9fb3c4}
+  </style>
+</head>
+<body>
+  <div class="results">
+    <div class="container">
+      <div id="results" class="card" aria-live="polite">
+        <div class="row">
+          <div>
+            <h1>ผลการคำนวณ TDEE</h1>
+            <p class="muted" id="suggestText">กรอกข้อมูลด้านล่าง แล้วกดคำนวณ</p>
+          </div>
+          <div class="stack">
+            <button class="btn btn-primary" id="btnCalc">คำนวณ</button>
+            <button class="btn btn-danger" id="btnClear">เคลียร์</button>
+          </div>
+        </div>
+        <div class="kpis" style="margin-top:12px">
+          <div class="kpi"><h3>Mifflin‑St Jeor <span id="tagMSJ" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeMSJ">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
+          <div class="kpi"><h3>Harris‑Benedict <span id="tagHB" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeHB">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
+          <div class="kpi"><h3>Katch‑McArdle <span id="tagKMA" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeKMA">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
+        </div>
+        <div class="kpi" style="margin-top:12px"><h3>Macro Suggestion <span id="macroLabel" class="muted">(30/25/45)</span></h3><div class="value" id="macroSplit">–</div><div class="muted">โปรตีน / ไขมัน / คาร์บ (g)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <main class="container" style="margin-top:12px">
+    <div class="card">
+      <h2>ข้อมูลของคุณ</h2>
+      <p class="muted" style="margin-top:0">หน่วยเมตริกเท่านั้น • *หากไม่ทราบ LBM ให้กรอกน้ำหนักจริง และ <b>ข้าม</b>ช่อง LBM</p>
+      <div class="grid grid-3">
+        <div><label for="sex">เพศ</label><select id="sex"><option value="male">ชาย</option><option value="female">หญิง</option></select></div>
+        <div><label for="age">อายุ (ปี)</label><input id="age" type="number" class="input" placeholder="เช่น 28"></div>
+        <div><label for="height">ส่วนสูง (ซม.)</label><input id="height" type="number" class="input" placeholder="เช่น 170"></div>
+        <div><label for="weight">น้ำหนักจริง (กก.)</label><input id="weight" type="number" class="input" placeholder="เช่น 70"></div>
+        <div><label for="bodyfat">% ไขมัน</label><input id="bodyfat" type="number" class="input" placeholder="เช่น 18"></div>
+        <div><label for="lbm">LBM (กก.)</label><input id="lbm" type="number" class="input" placeholder="เช่น 58"></div>
+        <div style="grid-column:1/-1">
+          <label>กิจกรรมต่อวัน</label>
+          <div id="activities" class="footer-card" style="display:flex;flex-direction:column;gap:6px">
+            <label><input type="checkbox" name="activity" value="1.2"> นั่งทำงาน (น้อยมาก) ×1.2</label>
+            <label><input type="checkbox" name="activity" value="1.375"> ออกกำลังกายเบา 1–3 วัน/สัปดาห์ ×1.375</label>
+            <label><input type="checkbox" name="activity" value="1.55" checked> ออกกำลังกายปานกลาง 3–5 วัน/สัปดาห์ ×1.55</label>
+            <label><input type="checkbox" name="activity" value="1.725"> หนัก 6–7 วัน/สัปดาห์ ×1.725</label>
+            <label><input type="checkbox" name="activity" value="1.9"> หนักมาก/แรงงาน ×1.9</label>
+            <small class="muted">เลือกได้ทีละ 1 รายการ ระบบจะยกเลิกตัวอื่นให้อัตโนมัติ</small>
+          </div>
+        </div>
+        <div><label for="goal">เป้าหมาย</label>
+          <select id="goal">
+            <option value="maintain" selected>คุมน้ำหนัก</option>
+            <option value="cut">ลดไขมัน</option>
+            <option value="bulk">เพิ่มน้ำหนัก</option>
+          </select>
+        </div>
+        <div><label for="macroMode">โหมด Macro</label>
+          <select id="macroMode">
+            <option value="percent" selected>เปอร์เซ็นต์ (พรีเซ็ต)</option>
+            <option value="kg">โปรตีนตามน้ำหนักตัว (g/kg)</option>
+          </select>
+        </div>
+        <div id="percentRow"><label for="macroPreset">สัดส่วนสารอาหาร (Macro Split)</label>
+          <select id="macroPreset">
+            <option value="auto" selected>อัตโนมัติ (ตามเป้าหมาย)</option>
+            <option value="30-25-45">30/25/45 — คุม</option>
+            <option value="35-20-45">35/20/45 — ลดไขมัน</option>
+            <option value="25-20-55">25/20/55 — เพิ่มน้ำหนัก</option>
+            <option value="40-30-30">40/30/30 — โปรตีนสูง</option>
+            <option value="25-40-35">25/40/35 — Low‑Carb</option>
+          </select>
+        </div>
+        <div id="kgRow" style="display:none"><label for="protPerKg">โปรตีนต่อ นน.ตัว (g/kg)</label>
+          <input id="protPerKg" type="number" class="input" step="0.1" placeholder="อัตโนมัติจากกิจกรรม/เป้าหมาย" />
+          <div class="hint">ค่ามาตรฐานตามกิจกรรม: 1.8 (เบา) → 2.2 (หนัก) g/kg • cut จะตั้งสูงสุด • bulk จะตั้งค่าต่ำสุดในกรอบ</div>
+        </div>
+      </div>
+      <div id="errors" class="error" style="margin-top:10px"></div>
+    </div>
+
+    <!-- หลักการคำนวณสารอาหารแบบนักโภชนาการ -->
+    <section style="margin-top:16px" class="footer-card">
+      <h3 style="margin-top:0">หลักการคำนวณสารอาหาร (แนวทางนักโภชนาการ)</h3>
+      <ol class="muted">
+        <li><b>โปรตีน</b> (โหมด g/kg): <code>โปรตีน(กรัม) = น้ำหนักตัว(กก.) × ตัวคูณตามกิจกรรม/เป้าหมาย</code> • กิจกรรมมากขึ้น → ค่าใกล้ 2.2 g/kg • ช่วง cut ใช้ด้านบนของช่วง
+        </li>
+        <li><b>ไขมัน</b> ตั้งตามเป้าหมาย: cut ≈ 20% kcal • maintain ≈ 25% kcal • bulk ≈ 20% kcal</li>
+        <li><b>คาร์บ</b> ได้จาก <code>คาร์บ(kcal) = TDEE − โปรตีน(kcal) − ไขมัน(kcal)</code> แล้วหาร 4 เป็นกรัม</li>
+        <li><b>เปอร์เซ็นต์ (โหมดพรีเซ็ต)</b>: cut 35/20/45 • maintain 30/25/45 • bulk 25/20/55</li>
+      </ol>
+    </section>
+
+    <!-- สูตรที่ใช้ (สมการ) -->
+    <section style="margin-top:16px" class="footer-card">
+      <h3 style="margin-top:0">สูตรที่ใช้ (เขียนเป็นสมการ)</h3>
+      <div class="muted">
+        <div><b>Mifflin‑St Jeor</b> (BMR):
+          <div><code>ชาย: BMR = 10·น้ำหนัก + 6.25·ส่วนสูง − 5·อายุ + 5</code></div>
+          <div><code>หญิง: BMR = 10·น้ำหนัก + 6.25·ส่วนสูง − 5·อายุ − 161</code></div>
+        </div>
+        <div style="margin-top:8px"><b>Harris‑Benedict (Revised)</b> (BMR):
+          <div><code>ชาย: 88.362 + 13.397·น้ำหนัก + 4.799·ส่วนสูง − 5.677·อายุ</code></div>
+          <div><code>หญิง: 447.593 + 9.247·น้ำหนัก + 3.098·ส่วนสูง − 4.330·อายุ</code></div>
+        </div>
+        <div style="margin-top:8px"><b>Katch‑McArdle</b> (BMR):
+          <div><code>BMR = 370 + 21.6·LBM</code></div>
+          <div><code>LBM = น้ำหนัก·(1 − %ไขมัน/100)</code></div>
+        </div>
+        <div style="margin-top:8px"><b>TDEE</b>: <code>TDEE = BMR · ตัวคูณกิจกรรม</code></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $=id=>document.getElementById(id);
+    const fmt=n=>isFinite(n)?new Intl.NumberFormat('th-TH',{maximumFractionDigits:0}).format(n):'–';
+
+    // single-select checkboxes for activity
+    (function(){
+      const boxes=[...document.querySelectorAll('input[name="activity"]')];
+      const ensureSingle=(e)=>{ if(e.target.checked){ boxes.forEach(b=>{ if(b!==e.target) b.checked=false; }); } };
+      boxes.forEach(b=> b.addEventListener('change', ensureSingle));
+    })();
+
+    function getActivity(){
+      const boxes=document.querySelectorAll('input[name="activity"]');
+      let val=NaN; boxes.forEach(b=>{if(b.checked){val=parseFloat(b.value)}});
+      return isNaN(val)?1.55:val;
+    }
+
+    function gatherInputs(){
+      return {sex:$("sex").value,age:parseFloat($("age").value),height:parseFloat($("height").value),weight:parseFloat($("weight").value),bf:parseFloat($("bodyfat").value),lbm:parseFloat($("lbm").value),activity:getActivity(),goal:$("goal").value,macroMode:$("macroMode").value,preset:$("macroPreset").value,protPerKg:parseFloat($("protPerKg").value)};
+    }
+
+    // BMR formulas
+    function bmrMSJ(s){ if([s.weight,s.height,s.age].some(v=>isNaN(v))) return NaN; return 10*s.weight+6.25*s.height-5*s.age+(s.sex==='male'?5:-161); }
+    function bmrHB(s){ if([s.weight,s.height,s.age].some(v=>isNaN(v))) return NaN; return s.sex==='male'?88.362+13.397*s.weight+4.799*s.height-5.677*s.age:447.593+9.247*s.weight+3.098*s.height-4.330*s.age; }
+    function bmrKMA(lbm){ if(isNaN(lbm)) return NaN; return 370+21.6*lbm; }
+
+    // Macro helpers
+    function macroPercentsByGoal(goal){
+      switch(goal){
+        case 'cut': return {p:0.35,f:0.20,c:0.45};
+        case 'bulk': return {p:0.25,f:0.20,c:0.55};
+        default: return {p:0.30,f:0.25,c:0.45}; // maintain
+      }
+    }
+    function getMacroPercents(goal,preset){
+      if(preset && preset!=='auto'){
+        const [p,f,c]=preset.split('-').map(x=>parseFloat(x)/100);
+        return {p,f,c};
+      }
+      return macroPercentsByGoal(goal);
+    }
+    function proteinPerKgFromActivity(act,goal){
+      let base = act>=1.9?2.2: act>=1.725?2.1: act>=1.55?2.0: act>=1.375?1.9:1.8;
+      if(goal==='cut') base = Math.min(2.2, base+0.0); // ใช้ค่าสูงสุดของช่วง
+      if(goal==='bulk') base = Math.max(1.8, base-0.1);
+      return base;
+    }
+
+    function calc(){
+      const s=gatherInputs();
+      let lbm=s.lbm;
+      if(isNaN(lbm)&&!isNaN(s.weight)&&!isNaN(s.bf)) lbm=s.weight*(1-s.bf/100);
+
+      const msj=bmrMSJ(s), hb=bmrHB(s), kma=bmrKMA(lbm);
+      const act=s.activity||1.55;
+
+      const tdeeMSJ = msj*act;
+      const tdeeHB  = hb*act;
+      const tdeeKMA = kma*act;
+
+      $("tdeeMSJ").textContent=fmt(tdeeMSJ);
+      $("tdeeHB").textContent=fmt(tdeeHB);
+      $("tdeeKMA").textContent=fmt(tdeeKMA);
+
+      const sug = !isNaN(lbm) ? 'KMA' : 'MSJ';
+      $("tagMSJ").style.display = sug==='MSJ'?'inline-flex':'none';
+      $("tagKMA").style.display = sug==='KMA'?'inline-flex':'none';
+
+      // choose display kcal baseline: ใช้ MSJ เป็นหลัก
+      const tdee = tdeeMSJ;
+
+      // Macro mode
+      if(s.macroMode==='percent'){
+        const perc=getMacroPercents(s.goal,s.preset);
+        $("macroLabel").textContent=`(${Math.round(perc.p*100)}/${Math.round(perc.f*100)}/${Math.round(perc.c*100)})`;
+        const proteinG=(tdee*perc.p)/4;
+        const fatG=(tdee*perc.f)/9;
+        const carbG=(tdee*perc.c)/4;
+        $("macroSplit").textContent=`P ${Math.round(proteinG)}g / F ${Math.round(fatG)}g / C ${Math.round(carbG)}g`;
+      } else {
+        // kg mode
+        const ppkg = isNaN(s.protPerKg) ? proteinPerKgFromActivity(act,s.goal) : s.protPerKg;
+        $("macroLabel").textContent=`(P=${ppkg.toFixed(1)} g/kg, Fat=${s.goal==='maintain'?25:20}% )`;
+        if(isFinite(s.weight)){
+          const proteinG = ppkg * s.weight;
+          const fatPct = s.goal==='maintain'?0.25:0.20;
+          const proteinKcal = proteinG*4;
+          const fatKcal = tdee*fatPct;
+          const carbKcal = Math.max(0, tdee - proteinKcal - fatKcal);
+          const fatG = fatKcal/9;
+          const carbG = carbKcal/4;
+          $("macroSplit").textContent=`P ${Math.round(proteinG)}g / F ${Math.round(fatG)}g / C ${Math.round(carbG)}g`;
+        } else {
+          $("macroSplit").textContent='–';
+        }
+      }
+
+      // ดันผลลัพธ์ขึ้นบนสุด
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    // UI wiring
+    $("btnCalc").onclick=calc;
+    $("btnClear").onclick=()=>{['age','height','weight','bodyfat','lbm','protPerKg'].forEach(id=>$(id).value=''); ["tdeeMSJ","tdeeHB","tdeeKMA","macroSplit"].forEach(id=>$(id).textContent='–'); $("macroLabel").textContent='(30/25/45)';};
+    $("goal").addEventListener('change',()=>calc());
+    $("macroMode").addEventListener('change',()=>{
+      const mode=$("macroMode").value;
+      $("percentRow").style.display = mode==='percent'?'' :'none';
+      $("kgRow").style.display      = mode==='kg'     ?'' :'none';
+      calc();
+    });
+    $("macroPreset").addEventListener('change',()=>calc());
+  </script>
+</body>
+</html>

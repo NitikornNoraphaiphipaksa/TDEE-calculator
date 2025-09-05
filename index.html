@@ -15,6 +15,8 @@
     .grid-3{grid-template-columns:1fr;} 
     @media(min-width:480px){.grid-3{grid-template-columns:1fr 1fr;}} 
     @media(min-width:768px){.grid-3{grid-template-columns:1fr 1fr 1fr;}} 
+    .grid-2{display:grid;gap:10px;grid-template-columns:1fr}
+    @media(min-width:640px){.grid-2{grid-template-columns:1fr 1fr}}
     label{font-size:.9rem;color:#cfe0ec;display:block;margin-bottom:4px;} 
     .input,select{width:50%;background:#0e141c;border:1px solid rgba(255,255,255,.08);color:var(--text);padding:6px 8px;border-radius:8px;font-size:.9rem;} 
     .btn{border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
@@ -60,38 +62,11 @@
             <small class="muted">เลือกได้ทีละ 1 รายการ ระบบจะยกเลิกตัวอื่นให้อัตโนมัติ</small>
           </div>
         </div>
-        <div><label for="goal">เป้าหมาย</label>
-          <select id="goal">
-            <option value="maintain" selected>คุมน้ำหนัก</option>
-            <option value="cut">ลดไขมัน</option>
-            <option value="bulk">เพิ่มน้ำหนัก</option>
-          </select>
-        </div>
-        <div><label for="macroMode">โหมด Macro</label>
-          <select id="macroMode">
-            <option value="percent" selected>เปอร์เซ็นต์ (พรีเซ็ต)</option>
-            <option value="kg">โปรตีนตามน้ำหนักตัว (g/kg)</option>
-          </select>
-        </div>
-        <div id="percentRow"><label for="macroPreset">สัดส่วนสารอาหาร (Macro Split)</label>
-          <select id="macroPreset">
-            <option value="auto" selected>อัตโนมัติ (ตามเป้าหมาย)</option>
-            <option value="30-25-45">30/25/45 — คุม</option>
-            <option value="35-20-45">35/20/45 — ลดไขมัน</option>
-            <option value="25-20-55">25/20/55 — เพิ่มน้ำหนัก</option>
-            <option value="40-30-30">40/30/30 — โปรตีนสูง</option>
-            <option value="25-40-35">25/40/35 — Low‑Carb</option>
-          </select>
-        </div>
-        <div id="kgRow" style="display:none"><label for="protPerKg">โปรตีนต่อ นน.ตัว (g/kg)</label>
-          <input id="protPerKg" type="number" class="input" step="0.1" placeholder="อัตโนมัติจากกิจกรรม/เป้าหมาย" />
-          <div class="hint">ค่ามาตรฐานตามกิจกรรม: 1.8 (เบา) → 2.2 (หนัก) g/kg • cut จะตั้งสูงสุด • bulk จะตั้งค่าต่ำสุดในกรอบ</div>
-        </div>
       </div>
       <div id="errors" class="error" style="margin-top:10px"></div>
     </div>
 
-    <!-- ย้ายผลลัพธ์มาไว้หลังฟอร์ม -->
+    <!-- ผลลัพธ์ -->
     <div class="results" style="margin-top:16px">
       <div class="container">
         <div id="results" class="card" aria-live="polite">
@@ -110,10 +85,50 @@
             <div class="kpi"><h3>Harris‑Benedict <span id="tagHB" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeHB">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
             <div class="kpi"><h3>Katch‑McArdle <span id="tagKMA" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeKMA">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
           </div>
-          <div class="kpi" style="margin-top:12px"><h3>Macro Suggestion <span id="macroLabel" class="muted">(30/25/45)</span></h3><div class="value" id="macroSplit">–</div><div class="muted">โปรตีน / ไขมัน / คาร์บ (g)</div></div>
+          <div class="kpi" style="margin-top:12px">
+            <h3>Macro Suggestion</h3>
+            <div class="grid-2">
+              <div class="kpi"><h4>ตั้งต้น <span id="macroLabelBase" class="muted"></span></h4><div class="value" id="macroSplitBase">–</div><div class="muted">โปรตีน / ไขมัน / คาร์บ (g)</div></div>
+              <div class="kpi"><h4>ปรับแล้ว <span id="macroLabelLive" class="muted"></span></h4><div class="value" id="macroSplitLive">–</div><div class="muted">โปรตีน / ไขมัน / คาร์บ (g)</div></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- ตัวเลือกเป้าหมายและ Macro (ย้ายมาต่อจากผลลัพธ์) -->
+    <section class="card" style="margin-top:16px">
+      <h3 style="margin-top:0">ปรับเป้าหมาย & Macro (คำนวณทันที)</h3>
+      <div class="grid grid-3">
+        <div><label for="goal2">เป้าหมาย</label>
+          <select id="goal2">
+            <option value="maintain" selected>คุมน้ำหนัก</option>
+            <option value="cut">ลดไขมัน</option>
+            <option value="bulk">เพิ่มน้ำหนัก</option>
+          </select>
+        </div>
+        <div><label for="macroMode2">โหมด Macro</label>
+          <select id="macroMode2">
+            <option value="percent" selected>เปอร์เซ็นต์ (พรีเซ็ต)</option>
+            <option value="kg">โปรตีนตามน้ำหนักตัว (g/kg)</option>
+          </select>
+        </div>
+        <div id="percentRow2"><label for="macroPreset2">สัดส่วนสารอาหาร (Macro Split)</label>
+          <select id="macroPreset2">
+            <option value="auto" selected>อัตโนมัติ (ตามเป้าหมาย)</option>
+            <option value="30-25-45">30/25/45 — คุม</option>
+            <option value="35-20-45">35/20/45 — ลดไขมัน</option>
+            <option value="25-20-55">25/20/55 — เพิ่มน้ำหนัก</option>
+            <option value="40-30-30">40/30/30 — โปรตีนสูง</option>
+            <option value="25-40-35">25/40/35 — Low‑Carb</option>
+          </select>
+        </div>
+        <div id="kgRow2" style="display:none"><label for="protPerKg2">โปรตีนต่อ นน.ตัว (g/kg)</label>
+          <input id="protPerKg2" type="number" class="input" step="0.1" placeholder="อัตโนมัติจากกิจกรรม/เป้าหมาย" />
+          <div class="hint">ค่ามาตรฐานตามกิจกรรม: 1.8 (เบา) → 2.2 (หนัก) g/kg • cut จะตั้งสูงสุด • bulk จะตั้งค่าต่ำสุดในกรอบ</div>
+        </div>
+      </div>
+    </section>
 
     <!-- หลักการคำนวณสารอาหารแบบนักโภชนาการ -->
     <section style="margin-top:16px" class="footer-card">
@@ -164,7 +179,7 @@
     }
 
     function gatherInputs(){
-      return {sex:$("sex").value,age:parseFloat($("age").value),height:parseFloat($("height").value),weight:parseFloat($("weight").value),bf:parseFloat($("bodyfat").value),lbm:parseFloat($("lbm").value),activity:getActivity(),goal:$("goal").value,macroMode:$("macroMode").value,preset:$("macroPreset").value,protPerKg:parseFloat($("protPerKg").value)};
+      return {sex:$("sex").value,age:parseFloat($("age").value),height:parseFloat($("height").value),weight:parseFloat($("weight").value),bf:parseFloat($("bodyfat").value),lbm:parseFloat($("lbm").value),activity:getActivity()};
     }
 
     function bmrMSJ(s){ if([s.weight,s.height,s.age].some(v=>isNaN(v))) return NaN; return 10*s.weight+6.25*s.height-5*s.age+(s.sex==='male'?5:-161); }
@@ -192,6 +207,31 @@
       return base;
     }
 
+    // cache for live macro compare
+    let lastKcal=NaN, lastWeight=NaN, lastAct=1.55;
+
+    function computeMacro(goal,mode,preset,protPerKg,kcal,weight,act){
+      if(mode==='percent'){
+        const perc=getMacroPercents(goal,preset);
+        const label=`(${Math.round(perc.p*100)}/${Math.round(perc.f*100)}/${Math.round(perc.c*100)})`;
+        if(isFinite(kcal)){
+          const p=(kcal*perc.p)/4, f=(kcal*perc.f)/9, c=(kcal*perc.c)/4;
+          return {label,text:`P ${Math.round(p)}g / F ${Math.round(f)}g / C ${Math.round(c)}g`};
+        }
+        return {label:'',text:'–'};
+      } else {
+        const ppkg=isFinite(protPerKg)?protPerKg:proteinPerKgFromActivity(act,goal);
+        const fatPct=(goal==='maintain')?0.25:0.20;
+        const label=`(P=${ppkg.toFixed(1)} g/kg, Fat=${Math.round(fatPct*100)}%)`;
+        if(isFinite(kcal)&&isFinite(weight)){
+          const p=ppkg*weight; const pk=p*4; const fk=kcal*fatPct; const ck=Math.max(0,kcal-pk-fk);
+          const f=fk/9, c=ck/4;
+          return {label,text:`P ${Math.round(p)}g / F ${Math.round(f)}g / C ${Math.round(c)}g`};
+        }
+        return {label,text:'–'};
+      }
+    }
+
     function calc(){
       const s = gatherInputs();
       // derive LBM from %BF if provided
@@ -211,61 +251,56 @@
       $("tdeeHB").textContent  = fmt(tdeeHB);
       $("tdeeKMA").textContent = fmt(tdeeKMA);
 
-      // suggestion tag
       const sug = !isNaN(lbm) ? 'KMA' : 'MSJ';
       $("tagMSJ").style.display = (sug==='MSJ')? 'inline-flex':'none';
       $("tagKMA").style.display = (sug==='KMA')? 'inline-flex':'none';
 
-      // choose main kcal (MSJ as baseline)
-      const kcal = tdeeMSJ;
+      // cache baseline for live updates
+      lastKcal=tdeeMSJ; lastWeight=s.weight; lastAct=act;
 
-      // Macro block
-      if(s.macroMode === 'percent'){
-        const perc = getMacroPercents(s.goal, s.preset);
-        $("macroLabel").textContent = `(${Math.round(perc.p*100)}/${Math.round(perc.f*100)}/${Math.round(perc.c*100)})`;
-        if(isFinite(kcal)){
-          const proteinG = (kcal*perc.p)/4;
-          const fatG     = (kcal*perc.f)/9;
-          const carbG    = (kcal*perc.c)/4;
-          $("macroSplit").textContent = `P ${Math.round(proteinG)}g / F ${Math.round(fatG)}g / C ${Math.round(carbG)}g`;
-        } else {
-          $("macroSplit").textContent = '–';
-        }
-      } else { // kg mode
-        const ppkg = isNaN(s.protPerKg) ? proteinPerKgFromActivity(act, s.goal) : s.protPerKg;
-        const fatPct = (s.goal==='maintain') ? 0.25 : 0.20;
-        $("macroLabel").textContent = `(P=${ppkg.toFixed(1)} g/kg, Fat=${Math.round(fatPct*100)}%)`;
-        if(isFinite(kcal) && isFinite(s.weight)){
-          const proteinG   = ppkg * s.weight;
-          const proteinKcal= proteinG*4;
-          const fatKcal    = kcal*fatPct;
-          const carbKcal   = Math.max(0, kcal - proteinKcal - fatKcal);
-          const fatG       = fatKcal/9;
-          const carbG      = carbKcal/4;
-          $("macroSplit").textContent = `P ${Math.round(proteinG)}g / F ${Math.round(fatG)}g / C ${Math.round(carbG)}g`;
-        } else {
-          $("macroSplit").textContent = '–';
-        }
-      }
+      // baseline macro using controls below
+      const goal = $("goal2").value;
+      const mode = $("macroMode2").value;
+      const preset = $("macroPreset2").value;
+      const protPerKg = parseFloat($("protPerKg2").value);
+      const base = computeMacro(goal,mode,preset,protPerKg,lastKcal,lastWeight,lastAct);
+      $("macroLabelBase").textContent = base.label;
+      $("macroSplitBase").textContent = base.text;
+      $("macroLabelLive").textContent = base.label;
+      $("macroSplitLive").textContent = base.text;
 
-      // scroll to result card
       document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    function updateMacroLive(){
+      if(!isFinite(lastKcal)) return; // need baseline first
+      const goal = $("goal2").value;
+      const mode = $("macroMode2").value;
+      const preset = $("macroPreset2").value;
+      const protPerKg = parseFloat($("protPerKg2").value);
+      const live = computeMacro(goal,mode,preset,protPerKg,lastKcal,lastWeight,lastAct);
+      $("macroLabelLive").textContent = live.label;
+      $("macroSplitLive").textContent = live.text;
     }
 
     // wiring
     $("btnCalc").onclick = calc;
     $("btnClear").onclick = ()=>{
-      ["age","height","weight","bodyfat","lbm","protPerKg"].forEach(id=>$(id).value='');
-      ["tdeeMSJ","tdeeHB","tdeeKMA","macroSplit"].forEach(id=>$(id).textContent='–');
-      $("macroLabel").textContent='(30/25/45)';
+      ["age","height","weight","bodyfat","lbm","protPerKg2"].forEach(id=>$(id)&&($(id).value=''));
+      ["tdeeMSJ","tdeeHB","tdeeKMA","macroSplitBase","macroSplitLive"].forEach(id=>$(id)&&($(id).textContent='–'));
+      ["macroLabelBase","macroLabelLive"].forEach(id=>$(id)&&($(id).textContent=''));
       window.scrollTo({top:0,behavior:'smooth'});
     };
-    $("macroMode").addEventListener('change', ()=>{
-      const mode = $("macroMode").value;
-      $("percentRow").style.display = mode==='percent' ? '' : 'none';
-      $("kgRow").style.display      = mode==='kg'      ? '' : 'none';
+
+    $("macroMode2").addEventListener('change', ()=>{
+      const mode = $("macroMode2").value;
+      $("percentRow2").style.display = mode==='percent' ? '' : 'none';
+      $("kgRow2").style.display      = mode==='kg'      ? '' : 'none';
+      updateMacroLive();
     });
-    $("macroPreset").addEventListener('change', ()=>{});
+    $("goal2").addEventListener('change', updateMacroLive);
+    $("macroPreset2").addEventListener('change', updateMacroLive);
+    $("protPerKg2").addEventListener('input', updateMacroLive);
   </script>
 </body>
 </html>

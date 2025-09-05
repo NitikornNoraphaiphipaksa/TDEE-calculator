@@ -190,3 +190,82 @@
       if(goal==='cut') base = 2.2;
       if(goal==='bulk') base = 1.8;
       return base;
+    }
+
+    function calc(){
+      const s = gatherInputs();
+      // derive LBM from %BF if provided
+      let lbm = s.lbm;
+      if(isNaN(lbm) && !isNaN(s.weight) && !isNaN(s.bf)) lbm = s.weight*(1 - s.bf/100);
+
+      const msj = bmrMSJ(s);
+      const hb  = bmrHB(s);
+      const kma = bmrKMA(lbm);
+      const act = s.activity || 1.55;
+
+      const tdeeMSJ = msj*act;
+      const tdeeHB  = hb*act;
+      const tdeeKMA = kma*act;
+
+      $("tdeeMSJ").textContent = fmt(tdeeMSJ);
+      $("tdeeHB").textContent  = fmt(tdeeHB);
+      $("tdeeKMA").textContent = fmt(tdeeKMA);
+
+      // suggestion tag
+      const sug = !isNaN(lbm) ? 'KMA' : 'MSJ';
+      $("tagMSJ").style.display = (sug==='MSJ')? 'inline-flex':'none';
+      $("tagKMA").style.display = (sug==='KMA')? 'inline-flex':'none';
+
+      // choose main kcal (MSJ as baseline)
+      const kcal = tdeeMSJ;
+
+      // Macro block
+      if(s.macroMode === 'percent'){
+        const perc = getMacroPercents(s.goal, s.preset);
+        $("macroLabel").textContent = `(${Math.round(perc.p*100)}/${Math.round(perc.f*100)}/${Math.round(perc.c*100)})`;
+        if(isFinite(kcal)){
+          const proteinG = (kcal*perc.p)/4;
+          const fatG     = (kcal*perc.f)/9;
+          const carbG    = (kcal*perc.c)/4;
+          $("macroSplit").textContent = `P ${Math.round(proteinG)}g / F ${Math.round(fatG)}g / C ${Math.round(carbG)}g`;
+        } else {
+          $("macroSplit").textContent = '–';
+        }
+      } else { // kg mode
+        const ppkg = isNaN(s.protPerKg) ? proteinPerKgFromActivity(act, s.goal) : s.protPerKg;
+        const fatPct = (s.goal==='maintain') ? 0.25 : 0.20;
+        $("macroLabel").textContent = `(P=${ppkg.toFixed(1)} g/kg, Fat=${Math.round(fatPct*100)}%)`;
+        if(isFinite(kcal) && isFinite(s.weight)){
+          const proteinG   = ppkg * s.weight;
+          const proteinKcal= proteinG*4;
+          const fatKcal    = kcal*fatPct;
+          const carbKcal   = Math.max(0, kcal - proteinKcal - fatKcal);
+          const fatG       = fatKcal/9;
+          const carbG      = carbKcal/4;
+          $("macroSplit").textContent = `P ${Math.round(proteinG)}g / F ${Math.round(fatG)}g / C ${Math.round(carbG)}g`;
+        } else {
+          $("macroSplit").textContent = '–';
+        }
+      }
+
+      // scroll to result card
+      document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    // wiring
+    $("btnCalc").onclick = calc;
+    $("btnClear").onclick = ()=>{
+      ["age","height","weight","bodyfat","lbm","protPerKg"].forEach(id=>$(id).value='');
+      ["tdeeMSJ","tdeeHB","tdeeKMA","macroSplit"].forEach(id=>$(id).textContent='–');
+      $("macroLabel").textContent='(30/25/45)';
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+    $("macroMode").addEventListener('change', ()=>{
+      const mode = $("macroMode").value;
+      $("percentRow").style.display = mode==='percent' ? '' : 'none';
+      $("kgRow").style.display      = mode==='kg'      ? '' : 'none';
+    });
+    $("macroPreset").addEventListener('change', ()=>{});
+  </script>
+</body>
+</html>

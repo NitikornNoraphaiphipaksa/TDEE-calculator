@@ -10,7 +10,6 @@
     .container{max-width:980px;margin-inline:auto;padding:16px;}
     h1{font-size:1.6rem;margin:0 0 12px;}
     p{color:var(--muted);} 
-    .results{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(11,15,20,.98),rgba(11,15,20,.92));backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line);} 
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;} 
     .grid{display:grid;gap:10px;} 
     .grid-3{grid-template-columns:1fr;} 
@@ -39,29 +38,6 @@
   </style>
 </head>
 <body>
-  <div class="results">
-    <div class="container">
-      <div id="results" class="card" aria-live="polite">
-        <div class="row">
-          <div>
-            <h1>ผลการคำนวณ TDEE</h1>
-            <p class="muted" id="suggestText">กรอกข้อมูลด้านล่าง แล้วกดคำนวณ</p>
-          </div>
-          <div class="stack">
-            <button class="btn btn-primary" id="btnCalc">คำนวณ</button>
-            <button class="btn btn-danger" id="btnClear">เคลียร์</button>
-          </div>
-        </div>
-        <div class="kpis" style="margin-top:12px">
-          <div class="kpi"><h3>Mifflin‑St Jeor <span id="tagMSJ" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeMSJ">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
-          <div class="kpi"><h3>Harris‑Benedict <span id="tagHB" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeHB">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
-          <div class="kpi"><h3>Katch‑McArdle <span id="tagKMA" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeKMA">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
-        </div>
-        <div class="kpi" style="margin-top:12px"><h3>Macro Suggestion <span id="macroLabel" class="muted">(30/25/45)</span></h3><div class="value" id="macroSplit">–</div><div class="muted">โปรตีน / ไขมัน / คาร์บ (g)</div></div>
-      </div>
-    </div>
-  </div>
-
   <main class="container" style="margin-top:12px">
     <div class="card">
       <h2>ข้อมูลของคุณ</h2>
@@ -115,12 +91,35 @@
       <div id="errors" class="error" style="margin-top:10px"></div>
     </div>
 
+    <!-- ย้ายผลลัพธ์มาไว้หลังฟอร์ม -->
+    <div class="results" style="margin-top:16px">
+      <div class="container">
+        <div id="results" class="card" aria-live="polite">
+          <div class="row">
+            <div>
+              <h1>ผลการคำนวณ TDEE</h1>
+              <p class="muted" id="suggestText">กรอกข้อมูลด้านบน แล้วกดคำนวณ</p>
+            </div>
+            <div class="stack">
+              <button class="btn btn-primary" id="btnCalc">คำนวณ</button>
+              <button class="btn btn-danger" id="btnClear">เคลียร์</button>
+            </div>
+          </div>
+          <div class="kpis" style="margin-top:12px">
+            <div class="kpi"><h3>Mifflin‑St Jeor <span id="tagMSJ" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeMSJ">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
+            <div class="kpi"><h3>Harris‑Benedict <span id="tagHB" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeHB">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
+            <div class="kpi"><h3>Katch‑McArdle <span id="tagKMA" class="tag" style="display:none">แนะนำ</span></h3><div class="value" id="tdeeKMA">–</div><div class="muted">กิโลแคลอรี/วัน</div></div>
+          </div>
+          <div class="kpi" style="margin-top:12px"><h3>Macro Suggestion <span id="macroLabel" class="muted">(30/25/45)</span></h3><div class="value" id="macroSplit">–</div><div class="muted">โปรตีน / ไขมัน / คาร์บ (g)</div></div>
+        </div>
+      </div>
+    </div>
+
     <!-- หลักการคำนวณสารอาหารแบบนักโภชนาการ -->
     <section style="margin-top:16px" class="footer-card">
       <h3 style="margin-top:0">หลักการคำนวณสารอาหาร (แนวทางนักโภชนาการ)</h3>
       <ol class="muted">
-        <li><b>โปรตีน</b> (โหมด g/kg): <code>โปรตีน(กรัม) = น้ำหนักตัว(กก.) × ตัวคูณตามกิจกรรม/เป้าหมาย</code> • กิจกรรมมากขึ้น → ค่าใกล้ 2.2 g/kg • ช่วง cut ใช้ด้านบนของช่วง
-        </li>
+        <li><b>โปรตีน</b> (โหมด g/kg): <code>โปรตีน(กรัม) = น้ำหนักตัว(กก.) × ตัวคูณตามกิจกรรม/เป้าหมาย</code></li>
         <li><b>ไขมัน</b> ตั้งตามเป้าหมาย: cut ≈ 20% kcal • maintain ≈ 25% kcal • bulk ≈ 20% kcal</li>
         <li><b>คาร์บ</b> ได้จาก <code>คาร์บ(kcal) = TDEE − โปรตีน(kcal) − ไขมัน(kcal)</code> แล้วหาร 4 เป็นกรัม</li>
         <li><b>เปอร์เซ็นต์ (โหมดพรีเซ็ต)</b>: cut 35/20/45 • maintain 30/25/45 • bulk 25/20/55</li>
@@ -152,7 +151,6 @@
     const $=id=>document.getElementById(id);
     const fmt=n=>isFinite(n)?new Intl.NumberFormat('th-TH',{maximumFractionDigits:0}).format(n):'–';
 
-    // single-select checkboxes for activity
     (function(){
       const boxes=[...document.querySelectorAll('input[name="activity"]')];
       const ensureSingle=(e)=>{ if(e.target.checked){ boxes.forEach(b=>{ if(b!==e.target) b.checked=false; }); } };
@@ -169,17 +167,15 @@
       return {sex:$("sex").value,age:parseFloat($("age").value),height:parseFloat($("height").value),weight:parseFloat($("weight").value),bf:parseFloat($("bodyfat").value),lbm:parseFloat($("lbm").value),activity:getActivity(),goal:$("goal").value,macroMode:$("macroMode").value,preset:$("macroPreset").value,protPerKg:parseFloat($("protPerKg").value)};
     }
 
-    // BMR formulas
     function bmrMSJ(s){ if([s.weight,s.height,s.age].some(v=>isNaN(v))) return NaN; return 10*s.weight+6.25*s.height-5*s.age+(s.sex==='male'?5:-161); }
     function bmrHB(s){ if([s.weight,s.height,s.age].some(v=>isNaN(v))) return NaN; return s.sex==='male'?88.362+13.397*s.weight+4.799*s.height-5.677*s.age:447.593+9.247*s.weight+3.098*s.height-4.330*s.age; }
     function bmrKMA(lbm){ if(isNaN(lbm)) return NaN; return 370+21.6*lbm; }
 
-    // Macro helpers
     function macroPercentsByGoal(goal){
       switch(goal){
         case 'cut': return {p:0.35,f:0.20,c:0.45};
         case 'bulk': return {p:0.25,f:0.20,c:0.55};
-        default: return {p:0.30,f:0.25,c:0.45}; // maintain
+        default: return {p:0.30,f:0.25,c:0.45};
       }
     }
     function getMacroPercents(goal,preset){
@@ -191,75 +187,6 @@
     }
     function proteinPerKgFromActivity(act,goal){
       let base = act>=1.9?2.2: act>=1.725?2.1: act>=1.55?2.0: act>=1.375?1.9:1.8;
-      if(goal==='cut') base = Math.min(2.2, base+0.0); // ใช้ค่าสูงสุดของช่วง
-      if(goal==='bulk') base = Math.max(1.8, base-0.1);
+      if(goal==='cut') base = 2.2;
+      if(goal==='bulk') base = 1.8;
       return base;
-    }
-
-    function calc(){
-      const s=gatherInputs();
-      let lbm=s.lbm;
-      if(isNaN(lbm)&&!isNaN(s.weight)&&!isNaN(s.bf)) lbm=s.weight*(1-s.bf/100);
-
-      const msj=bmrMSJ(s), hb=bmrHB(s), kma=bmrKMA(lbm);
-      const act=s.activity||1.55;
-
-      const tdeeMSJ = msj*act;
-      const tdeeHB  = hb*act;
-      const tdeeKMA = kma*act;
-
-      $("tdeeMSJ").textContent=fmt(tdeeMSJ);
-      $("tdeeHB").textContent=fmt(tdeeHB);
-      $("tdeeKMA").textContent=fmt(tdeeKMA);
-
-      const sug = !isNaN(lbm) ? 'KMA' : 'MSJ';
-      $("tagMSJ").style.display = sug==='MSJ'?'inline-flex':'none';
-      $("tagKMA").style.display = sug==='KMA'?'inline-flex':'none';
-
-      // choose display kcal baseline: ใช้ MSJ เป็นหลัก
-      const tdee = tdeeMSJ;
-
-      // Macro mode
-      if(s.macroMode==='percent'){
-        const perc=getMacroPercents(s.goal,s.preset);
-        $("macroLabel").textContent=`(${Math.round(perc.p*100)}/${Math.round(perc.f*100)}/${Math.round(perc.c*100)})`;
-        const proteinG=(tdee*perc.p)/4;
-        const fatG=(tdee*perc.f)/9;
-        const carbG=(tdee*perc.c)/4;
-        $("macroSplit").textContent=`P ${Math.round(proteinG)}g / F ${Math.round(fatG)}g / C ${Math.round(carbG)}g`;
-      } else {
-        // kg mode
-        const ppkg = isNaN(s.protPerKg) ? proteinPerKgFromActivity(act,s.goal) : s.protPerKg;
-        $("macroLabel").textContent=`(P=${ppkg.toFixed(1)} g/kg, Fat=${s.goal==='maintain'?25:20}% )`;
-        if(isFinite(s.weight)){
-          const proteinG = ppkg * s.weight;
-          const fatPct = s.goal==='maintain'?0.25:0.20;
-          const proteinKcal = proteinG*4;
-          const fatKcal = tdee*fatPct;
-          const carbKcal = Math.max(0, tdee - proteinKcal - fatKcal);
-          const fatG = fatKcal/9;
-          const carbG = carbKcal/4;
-          $("macroSplit").textContent=`P ${Math.round(proteinG)}g / F ${Math.round(fatG)}g / C ${Math.round(carbG)}g`;
-        } else {
-          $("macroSplit").textContent='–';
-        }
-      }
-
-      // ดันผลลัพธ์ขึ้นบนสุด
-      window.scrollTo({top:0,behavior:'smooth'});
-    }
-
-    // UI wiring
-    $("btnCalc").onclick=calc;
-    $("btnClear").onclick=()=>{['age','height','weight','bodyfat','lbm','protPerKg'].forEach(id=>$(id).value=''); ["tdeeMSJ","tdeeHB","tdeeKMA","macroSplit"].forEach(id=>$(id).textContent='–'); $("macroLabel").textContent='(30/25/45)';};
-    $("goal").addEventListener('change',()=>calc());
-    $("macroMode").addEventListener('change',()=>{
-      const mode=$("macroMode").value;
-      $("percentRow").style.display = mode==='percent'?'' :'none';
-      $("kgRow").style.display      = mode==='kg'     ?'' :'none';
-      calc();
-    });
-    $("macroPreset").addEventListener('change',()=>calc());
-  </script>
-</body>
-</html>

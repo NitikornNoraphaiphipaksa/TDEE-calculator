@@ -12,20 +12,25 @@
     p{color:var(--muted);} 
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;} 
     .grid{display:grid;gap:14px;} 
+    .grid-2{grid-template-columns:1fr;} 
     .grid-3{grid-template-columns:1fr;} 
-    @media(min-width:480px){.grid-3{grid-template-columns:1fr 1fr;}} 
-    @media(min-width:768px){.grid-3{grid-template-columns:1fr 1fr 1fr;}} 
+    @media(min-width:480px){.grid-2{grid-template-columns:1fr 1fr}.grid-3{grid-template-columns:1fr 1fr}} 
+    @media(min-width:768px){.grid-3{grid-template-columns:1fr 1fr 1fr}} 
     label{font-size:.9rem;color:#cfe0ec;display:block;margin-bottom:6px;} 
-    .input, select{width:100%;background:#eef2f7;border:1px solid rgba(0,0,0,.08);color:#0b0f14;padding:8px 10px;border-radius:10px;font-size:.9rem;box-sizing:border-box;}  
-    .btn{border:0;border-radius:12px;padding:14px 28px;font-weight:600;cursor:pointer;min-width:160px}
+    .input,select{width:100%;background:#eef2f7;border:1px solid rgba(0,0,0,.08);color:#0b0f14;padding:10px 12px;border-radius:10px;font-size:.95rem;}  
+    .btn{border:0;border-radius:12px;padding:14px 24px;font-weight:600;cursor:pointer;min-width:140px;font-size:1.05rem}
     .btn-primary{background:#2dd36f;color:#053d1f;border:0} 
     .btn-danger{background:#ff4d4f;color:white;border:0} 
-    .stack{display:flex;gap:12px;flex-wrap:wrap}
+    .stack{display:flex;gap:10px;flex-wrap:wrap}
     .kpis{display:grid;gap:10px;grid-template-columns:1fr}
     @media(min-width:640px){.kpis{grid-template-columns:repeat(3,1fr)}}
+    .hero{background:#3ad97a;color:#062b14;border-radius:16px;padding:14px;border:1px solid rgba(0,0,0,.05)}
+    .hero h3{margin:0 0 4px;font-size:1rem;color:#0a3c22}
+    .hero .big{font-size:2.2rem;font-weight:900}
     .kpi{border-radius:14px;padding:12px;background:#0f1620;border:1px solid var(--line)}
     .kpi h3{margin:0 0 4px;font-size:.95rem;}
     .kpi .value{font-size:1.4rem;font-weight:800}
+    .tag{display:inline-flex;font-size:.8rem;color:#0a2d22;background:var(--accent);padding:2px 6px;border-radius:999px;font-weight:700}
     .muted{color:var(--muted)}
     .error{color:var(--danger);font-size:.9rem}
     .footer-card{background:#0f1620;border:1px solid var(--line);border-radius:16px;padding:14px}
@@ -34,8 +39,6 @@
     .row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
     .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:12px 0}
     .hint{font-size:.85rem;color:#9fb3c4}
-    details{margin-top:16px}
-    details pre{background:#0f1620;border:1px solid var(--line);border-radius:12px;padding:10px;overflow:auto;color:#dbe7f1}
   </style>
 </head>
 <body>
@@ -45,8 +48,8 @@
       <p class="muted">TDEE (Total Daily Energy Expenditure) คือพลังงานที่ร่างกายใช้ในแต่ละวัน ประกอบด้วยการเผาผลาญพื้นฐาน (BMR) และกิจกรรมต่าง ๆ โปรแกรมนี้ช่วยคุณประมาณค่าพลังงานและสัดส่วนสารอาหารที่เหมาะสม</p>
       <h2 style="margin-top:16px">ข้อมูลของคุณ</h2>
       <p class="muted" style="margin-top:0">หน่วยเมตริกเท่านั้น • *หากไม่ทราบ LBM ให้กรอกน้ำหนักจริง และ <b>ข้าม</b>ช่อง LBM</p>
-      <div class="grid grid-3">
-        <div><label for="sex">เพศ</label><select id="sex" class="input"><option value="male">ชาย</option><option value="female">หญิง</option></select></div>
+      <div class="grid grid-2">
+        <div><label for="sex">เพศ</label><select id="sex"><option value="male">ชาย</option><option value="female">หญิง</option></select></div>
         <div><label for="age">อายุ (ปี)</label><input id="age" type="number" class="input" placeholder="เช่น 28"></div>
         <div><label for="height">ส่วนสูง (ซม.)</label><input id="height" type="number" class="input" placeholder="เช่น 170"></div>
         <div><label for="weight">น้ำหนักจริง (กก.)</label><input id="weight" type="number" class="input" placeholder="เช่น 70"></div>
@@ -63,263 +66,32 @@
             <small class="muted">เลือกได้ทีละ 1 รายการ ระบบจะยกเลิกตัวอื่นให้อัตโนมัติ</small>
           </div>
         </div>
-        <div style="grid-column:1/-1">
-          <label for="macroGoal">เป้าหมายสารอาหาร</label>
-          <select id="macroGoal" class="input">
-            <option value="maintain" selected>Maintain (30/25/45)</option>
-            <option value="cut">Cut (35/20/45)</option>
-            <option value="bulk">Bulk (25/20/55)</option>
-            <option value="lowcarb">Low Carb (30/40/30)</option>
-            <option value="highcarb">High Carb (20/20/60)</option>
-            <option value="carnivore">Carnivore (40/60/0)</option>
-            <option value="keto">Keto (25/70/5)</option>
-          </select>
-        </div>
       </div>
       <div id="errors" class="error" style="margin-top:10px"></div>
-      <div class="stack" style="margin-top:16px">
-        <button class="btn btn-primary" id="btnCalc">คำนวณ</button>
-        <button class="btn btn-danger" id="btnClear">เคลียร์</button>
-      </div>
     </div>
 
-    <div id="results" class="card" style="margin-top:16px;display:none">
-      <h3>ผลการคำนวณ TDEE</h3>
-      <div class="kpis">
-        <div class="kpi"><h3>Mifflin-St Jeor</h3><div class="value" id="tdeeMSJ">-</div><div class="muted">กิโลแคลอรี/วัน</div></div>
-        <div class="kpi"><h3>Harris-Benedict</h3><div class="value" id="tdeeHB">-</div><div class="muted">กิโลแคลอรี/วัน</div></div>
-        <div class="kpi"><h3>Katch-McArdle</h3><div class="value" id="tdeeKMA">-</div><div class="muted">กิโลแคลอรี/วัน</div></div>
-      </div>
-      <div class="kpi" style="margin-top:12px">
-        <h3>คำแนะนำสารอาหาร <span id="macroLabel" class="muted"></span></h3>
-        <div class="value" id="macroSplit">-</div>
-        <div class="muted">โปรตีน / ไขมัน / คาร์บ (g)</div>
+    <!-- ผลลัพธ์ -->
+    <div class="results" style="margin-top:16px">
+      <div class="container">
+        <div id="results" class="card" aria-live="polite">
+          <div class="row">
+            <div>
+              <h1>ผลการคำนวณ TDEE</h1>
+              <p class="muted" id="suggestText">กรอกข้อมูลด้านบน แล้วกดคำนวณ</p>
+            </div>
+            <div class="stack">
+              <button class="btn btn-primary" id="btnCalc">คำนวณ</button>
+              <button class="btn btn-danger" id="btnClear">เคลียร์</button>
+            </div>
+          </div>
+          <div class="hero" style="margin-top:10px">
+            <h3>ค่า TDEE (อ้างอิง MSJ)</h3>
+            <div class="big" id="tdeeMain">–</div>
+            <div class="muted" style="color:#0a3c22">กิโลแคลอรี/วัน</div>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- หลักการคำนวณสารอาหาร -->
-    <section style="margin-top:16px" class="footer-card">
-      <h3 style="margin-top:0">หลักการคำนวณสารอาหาร (แนวทางนักโภชนาการ)</h3>
-      <ol class="muted">
-        <li><b>โปรตีน</b>: โปรตีน (กรัม) = (TDEE × %โปรตีน) ÷ 4</li>
-        <li><b>ไขมัน</b>: ไขมัน (กรัม) = (TDEE × %ไขมัน) ÷ 9</li>
-        <li><b>คาร์บ</b>: คาร์บ (กรัม) = (TDEE × %คาร์บ) ÷ 4</li>
-      </ol>
-    </section>
-
-    <!-- สูตรที่ใช้ -->
-    <section style="margin-top:16px" class="footer-card">
-      <h3 style="margin-top:0">สูตรที่ใช้ (สมการ)</h3>
-      <div class="muted">
-        <div><b>Mifflin‑St Jeor</b> (BMR):
-          <div><code>ชาย: BMR = 10·น้ำหนัก + 6.25·ส่วนสูง − 5·อายุ + 5</code></div>
-          <div><code>หญิง: BMR = 10·น้ำหนัก + 6.25·ส่วนสูง − 5·อายุ − 161</code></div>
-        </div>
-        <div style="margin-top:8px"><b>Harris‑Benedict (Revised)</b> (BMR):
-          <div><code>ชาย: 88.362 + 13.397·น้ำหนัก + 4.799·ส่วนสูง − 5.677·อายุ</code></div>
-          <div><code>หญิง: 447.593 + 9.247·น้ำหนัก + 3.098·ส่วนสูง − 4.330·อายุ</code></div>
-        </div>
-        <div style="margin-top:8px"><b>Katch‑McArdle</b> (BMR):
-          <div><code>BMR = 370 + 21.6·LBM</code></div>
-          <div><code>LBM = น้ำหนัก·(1 − %ไขมัน/100)</code></div>
-        </div>
-        <div style="margin-top:8px"><b>TDEE</b>: <code>TDEE = BMR × ตัวคูณกิจกรรม</code></div>
-      </div>
-    </section>
-
-    <!-- อ้างอิงวิชาการ -->
-    <section style="margin-top:16px" class="footer-card">
-      <h3 style="margin-top:0">เอกสารอ้างอิง</h3>
-      <ul class="muted">
-        <li>Mifflin, M.D., St Jeor, S.T., Hill, L.A., Scott, B.J., Daugherty, S.A., & Koh, Y.O. (1990). A new predictive equation for resting energy expenditure in healthy individuals. <i>American Journal of Clinical Nutrition</i>, 51(2), 241–247.</li>
-        <li>Harris, J.A., & Benedict, F.G. (1919). A biometric study of human basal metabolism. <i>Proceedings of the National Academy of Sciences</i>, 4(12), 370–373.</li>
-        <li>Katch, V.L., & McArdle, W.D. (1973). Prediction of body density from simple anthropometric measurements in college-age men and women. <i>Human Biology</i>, 45(3), 445–454.</li>
-      </ul>
-    </section>
-
-    <!-- DEV: Testcases UI -->
-    <details>
-      <summary>ทดสอบ (Dev)</summary>
-      <button class="btn" id="btnRunTests" type="button">รันทดสอบ</button>
-      <pre id="testLog"></pre>
-    </details>
   </main>
-
-  <script>
-    // Utilities
-    function $(id){ return document.getElementById(id); }
-    function fmt(n){ return isFinite(n) ? new Intl.NumberFormat('th-TH',{maximumFractionDigits:0}).format(n) : '-'; }
-
-    (function(){
-      var boxes = Array.prototype.slice.call(document.querySelectorAll('input[name="activity"]'));
-      function ensureSingle(e){ if(e.target.checked){ boxes.forEach(function(b){ if(b!==e.target) b.checked=false; }); } }
-      boxes.forEach(function(b){ b.addEventListener('change', ensureSingle); });
-    })();
-
-    function getActivity(){
-      var boxes=document.querySelectorAll('input[name="activity"]');
-      var val=NaN; boxes.forEach(function(b){ if(b.checked){ val=parseFloat(b.value); } });
-      return isNaN(val)?1.55:val;
-    }
-
-    function gatherInputs(){
-      return {
-        sex: $('sex').value,
-        age: parseFloat($('age').value),
-        height: parseFloat($('height').value),
-        weight: parseFloat($('weight').value),
-        bf: parseFloat($('bodyfat').value),
-        lbm: parseFloat($('lbm').value),
-        activity: getActivity(),
-        macroGoal: $('macroGoal').value
-      };
-    }
-
-    function bmrMSJ(s){ if([s.weight,s.height,s.age].some(function(v){return isNaN(v);})){ return NaN; } return 10*s.weight + 6.25*s.height - 5*s.age + (s.sex==='male'?5:-161); }
-    function bmrHB(s){ if([s.weight,s.height,s.age].some(function(v){return isNaN(v);})){ return NaN; } return s.sex==='male' ? 88.362 + 13.397*s.weight + 4.799*s.height - 5.677*s.age : 447.593 + 9.247*s.weight + 3.098*s.height - 4.330*s.age; }
-    function bmrKMA(lbm){ if(isNaN(lbm)) return NaN; return 370 + 21.6*lbm; }
-
-    function getMacroPercents(goal){
-      switch(goal){
-        case 'cut': return {p:0.35,f:0.20,c:0.45};
-        case 'bulk': return {p:0.25,f:0.20,c:0.55};
-        case 'lowcarb': return {p:0.30,f:0.40,c:0.30};
-        case 'highcarb': return {p:0.20,f:0.20,c:0.60};
-        case 'carnivore': return {p:0.40,f:0.60,c:0.00};
-        case 'keto': return {p:0.25,f:0.70,c:0.05};
-        default: return {p:0.30,f:0.25,c:0.45};
-      }
-    }
-
-    function computeMacro(kcal, goal){
-      var perc = getMacroPercents(goal);
-      var proteinG = (kcal*perc.p)/4;
-      var fatG = (kcal*perc.f)/9;
-      var carbG = (kcal*perc.c)/4;
-      return {
-        label: '(' + Math.round(perc.p*100) + '/' + Math.round(perc.f*100) + '/' + Math.round(perc.c*100) + ')',
-        text: 'P ' + Math.round(proteinG) + 'g / F ' + Math.round(fatG) + 'g / C ' + Math.round(carbG) + 'g'
-      };
-    }
-
-    // คำนวณและแสดงผล
-    function calc(){
-      var s = gatherInputs();
-      if(isNaN(s.age) || isNaN(s.height) || isNaN(s.weight)){
-        $('errors').textContent = 'กรุณากรอกข้อมูลให้ครบ (อายุ/ส่วนสูง/น้ำหนัก)';
-        return;
-      }
-      $('errors').textContent = '';
-
-      var msj = bmrMSJ(s);
-      var hb  = bmrHB(s);
-      var lbmVal = !isNaN(s.lbm) ? s.lbm : (!isNaN(s.bf) ? s.weight*(1 - s.bf/100) : NaN);
-      var kma = bmrKMA(lbmVal);
-      var act = s.activity;
-
-      var tdeeMSJ = msj*act;
-      var tdeeHB  = hb*act;
-      var tdeeKMA = isNaN(kma) ? NaN : kma*act;
-
-      $('results').style.display = 'block';
-      $('tdeeMSJ').textContent = fmt(tdeeMSJ);
-      $('tdeeHB').textContent  = fmt(tdeeHB);
-      $('tdeeKMA').textContent = fmt(tdeeKMA);
-
-      // เก็บค่าไว้สำหรับอัปเดตสารอาหารแบบสดเมื่อเปลี่ยน dropdown
-      window.__lastKcal = tdeeMSJ;
-
-      if(isFinite(tdeeMSJ)){
-        var m = computeMacro(tdeeMSJ, s.macroGoal);
-        $('macroLabel').textContent = m.label;
-        $('macroSplit').textContent = m.text;
-      } else {
-        $('macroLabel').textContent = '';
-        $('macroSplit').textContent = '-';
-      }
-
-      // เลื่อนขึ้นไปที่ผลลัพธ์
-      document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
-    }
-
-    // ผูกปุ่ม
-    var btnCalc = document.getElementById('btnCalc');
-    if(btnCalc) btnCalc.addEventListener('click', calc);
-
-    var btnClear = document.getElementById('btnClear');
-    if(btnClear) btnClear.addEventListener('click', function(){
-      ['age','height','weight','bodyfat','lbm'].forEach(function(id){ var el=$(id); if(el) el.value=''; });
-      ['tdeeMSJ','tdeeHB','tdeeKMA','macroSplit'].forEach(function(id){ var el=$(id); if(el) el.textContent='-'; });
-      $('macroLabel').textContent='';
-      $('macroGoal').value='maintain';
-      var res=$('results'); if(res) res.style.display='none';
-      window.__lastKcal = NaN;
-      window.scrollTo({top:0,behavior:'smooth'});
-    });
-
-    // อัปเดตสารอาหารทันทีเมื่อเปลี่ยนเป้าหมาย
-    var goalSel = document.getElementById('macroGoal');
-    if(goalSel) goalSel.addEventListener('change', function(){
-      var kcal = window.__lastKcal;
-      if(isFinite(kcal)){
-        var m = computeMacro(kcal, goalSel.value);
-        $('macroLabel').textContent = m.label;
-        $('macroSplit').textContent = m.text;
-      }
-    });
-
-    // ===== ชุดทดสอบพื้นฐาน =====
-    function approx(a,b,tol){ return Math.abs(a-b) <= (tol||3); }
-    function runTests(){
-      var out = [];
-      function log(msg){ out.push(msg); }
-
-      // MSJ male 70/170/30
-      var s1 = {sex:'male',weight:70,height:170,age:30};
-      var b1 = 10*70 + 6.25*170 - 5*30 + 5; // 1617.5
-      log('MSJ male baseline = ' + b1.toFixed(1));
-      console.assert(approx(bmrMSJ(s1), b1, 0.1), 'MSJ male mismatch');
-
-      // HB female 60/160/25
-      var s2 = {sex:'female',weight:60,height:160,age:25};
-      var hb2 = 447.593 + 9.247*60 + 3.098*160 - 4.330*25;
-      console.assert(approx(bmrHB(s2), hb2, 0.5), 'HB female mismatch');
-
-      // KMA from bf%
-      var w=70, bf=18; var lbm = w*(1-bf/100); var k = 370+21.6*lbm;
-      console.assert(approx(bmrKMA(lbm), k, 0.5), 'KMA mismatch');
-
-      // Macro sum equals kcal (maintain)
-      var kcal=2500; var perc = getMacroPercents('maintain');
-      var p=(kcal*perc.p)/4, f=(kcal*perc.f)/9, c=(kcal*perc.c)/4;
-      var kcalBack = p*4 + f*9 + c*4;
-      console.assert(approx(kcalBack, kcal, 10), 'Macro kcal mismatch (maintain)');
-
-      // Macro sum (keto)
-      var kcalK=2200; var percK = getMacroPercents('keto');
-      var pK=(kcalK*percK.p)/4, fK=(kcalK*percK.f)/9, cK=(kcalK*percK.c)/4;
-      var kcalBackK = pK*4 + fK*9 + cK*4;
-      console.assert(approx(kcalBackK, kcalK, 12), 'Macro kcal mismatch (keto)');
-
-      // Macro sum (lowcarb)
-      var kcalL=2100; var percL = getMacroPercents('lowcarb');
-      var pL=(kcalL*percL.p)/4, fL=(kcalL*percL.f)/9, cL=(kcalL*percL.c)/4;
-      var kcalBackL = pL*4 + fL*9 + cL*4;
-      console.assert(approx(kcalBackL, kcalL, 12), 'Macro kcal mismatch (lowcarb)');
-
-      // Added tests: cut & bulk
-      var kcalC=2000; var percC=getMacroPercents('cut');
-      var pC=(kcalC*percC.p)/4, fC=(kcalC*percC.f)/9, cC=(kcalC*percC.c)/4;
-      var kcalBackC=pC*4+fC*9+cC*4; console.assert(approx(kcalBackC, kcalC, 10), 'Macro kcal mismatch (cut)');
-
-      var kcalB=2600; var percB=getMacroPercents('bulk');
-      var pB=(kcalB*percB.p)/4, fB=(kcalB*percB.f)/9, cB=(kcalB*percB.c)/4;
-      var kcalBackB=pB*4+fB*9+cB*4; console.assert(approx(kcalBackB, kcalB, 12), 'Macro kcal mismatch (bulk)');
-
-      $('testLog').textContent = out.join('\n') + '\nOK: tests executed. ดูผล asserts ใน console.';
-    }
-    var btnTests = document.getElementById('btnRunTests');
-    if(btnTests) btnTests.addEventListener('click', runTests);
-  </script>
 </body>
 </html>
